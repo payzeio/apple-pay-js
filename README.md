@@ -56,7 +56,7 @@ giving them tools they need.
 3. include following html
    ```html
    <div id="apple-pay">
-     <div id="apple-pay-button">
+     <div id="pay-button">
 
      </div>
    </div>
@@ -66,11 +66,11 @@ giving them tools they need.
 
 ```js
 // Payze SDK accepts 2 arguments: transactionId and styles object
-// styles object is optional and can be used to customize card inputs
+// styles object is optional and can be used to customize pay button
 // Example usage: 
 const payze = Payze('transactionId', {
-  iframeWidth: '130',
-  iframeHeight: '30' // height of iframe in pixels (default: 200)
+  iframeWidth: '130', // width of iframe in pixels (default: 130)
+  iframeHeight: '30' // height of iframe in pixels (default: 30)
 });
  ```
 

@@ -36,7 +36,7 @@ function InitPayzeApplePay(trId, { iframeWidth = '130', iframeHeight = '30' }) {
       if (createdElements) {
         return;
       }
-      var element = document.getElementById('apple-pay');
+      var element = document.getElementById('pay-button');
 
       var iframe = document.createElement('iframe');
       iframe.setAttribute('src', `${iframeUrl}`);
