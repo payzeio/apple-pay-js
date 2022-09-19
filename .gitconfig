@@ -1,0 +1,11 @@
+[user]
+    name = Irakli, Kikava
+    email = ikakikava@gmail.com
+[http]
+    sslVerify = false
+[push]
+    default = simple
+[credential]
+    helper = cache --timeout=360000000
+[core]
+    autocrlf = false
