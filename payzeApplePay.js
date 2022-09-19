@@ -28,7 +28,7 @@ function InitPayzeApplePay(trId, { iframeWidth = '130', iframeHeight = '30' }) {
    * @param {string} trId  Transaction ID.
    */
   function generateIframeUrl(trId) {
-    iframeUrl = `${BASE_URL}/applePay?transactionId=${trId}`;
+    iframeUrl = `${BASE_URL}/apple-pay/pay?transactionId=${trId}`;
   }
 
   function renderApplePay() {
