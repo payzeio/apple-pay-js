@@ -55,7 +55,9 @@ giving them tools they need.
    ```
 3. include following html
    ```html
-    <div class="apple-pay-button apple-pay-button-black" id="apple-pay-button" (click)="clickEvent()">
+    <div class="apple-pay-button apple-pay-button-black" 
+          id="apple-pay-button" 
+          (click)="clickEvent()">
 
     </div>
    ```
@@ -63,7 +65,7 @@ giving them tools they need.
    ```ts
    clickEvent() {
     this.applePay.makeApplePay('trId');
-  }
+   }
    ```
 
 ### Customization
