@@ -47,30 +47,36 @@ giving them tools they need.
 
 1. Import payze-apple-pay SDK
    ```ts
-   import {Payze} from "@payze/payze-apple-pay";
+   import { PayzeApplePay } from "@payze/payze-apple-pay";
    ```
 2. initialize payze
    ```ts
-   const payze = Payze('transactionId', {});
+   const applePay = PayzeApplePay({});
    ```
 3. include following html
    ```html
-   <div id="apple-pay">
-     <div id="pay-button">
+  <div class="apple-pay-button apple-pay-button-black" id="apple-pay-button" (click)="clickEvent()">
 
-     </div>
-   </div>
+  </div>
+   ```
+4. initialize event and pass the transaction parameter
+   ```ts
+  clickEvent() {
+    this.applePay.makeApplePay('trId');
+  }
    ```
 
 ### Customization
 
 ```js
-// Payze SDK accepts 2 arguments: transactionId and styles object
-// styles object is optional and can be used to customize pay button
+// Payze Apple Pay SDK accepts 2 arguments: merchant Identifier and configuration
+// both are required
 // Example usage: 
-const payze = Payze('transactionId', {
-  iframeWidth: '130', // width of iframe in pixels (default: 130)
-  iframeHeight: '30' // height of iframe in pixels (default: 30)
+const payze = PayzeApplePay('merchant.io.payze', {
+  amount: 10, // 
+  currencyCode: 'GEL', // default
+  countryCode: 'GE', // default
+  label: 'Payze' // default
 });
  ```
 
