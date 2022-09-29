@@ -55,13 +55,13 @@ giving them tools they need.
    ```
 3. include following html
    ```html
-  <div class="apple-pay-button apple-pay-button-black" id="apple-pay-button" (click)="clickEvent()">
+    <div class="apple-pay-button apple-pay-button-black" id="apple-pay-button" (click)="clickEvent()">
 
-  </div>
+    </div>
    ```
-4. initialize event and pass the transaction parameter
+4. initialize payze
    ```ts
-  clickEvent() {
+   clickEvent() {
     this.applePay.makeApplePay('trId');
   }
    ```

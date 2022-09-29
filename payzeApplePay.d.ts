@@ -10,6 +10,6 @@
  *
  */
 
-export function PayzeApplePay(merchantIdentifier, config: any): {
+export function PayzeApplePay(merchantIdentifier: string, config: any): {
   makeApplePay: (trId: string) => void;
 };
