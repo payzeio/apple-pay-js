@@ -49,11 +49,11 @@ giving them tools they need.
    ```ts
    import { PayzeApplePay } from "@payze/payze-apple-pay";
    ```
-2. initialize payze
+2. Initialize payze
    ```ts
    const applePay = PayzeApplePay({});
    ```
-3. include following html
+3. Include following html
    ```html
     <div class="apple-pay-button apple-pay-button-black" 
           id="apple-pay-button" 
@@ -61,10 +61,10 @@ giving them tools they need.
 
     </div>
    ```
-4. initialize payze
+4. Initialize Payment (In order to get transactionId you need to make request from API (<a href="https://docs.payze.io/reference/just-pay">'Just Pay'</a> or <a href="https://docs.payze.io/reference/single-payment-and-split">'Single Payment and Split'</a>)
    ```ts
    clickEvent() {
-    this.applePay.makeApplePay('trId');
+    this.applePay.makeApplePay('transactionId');
    }
    ```
 
@@ -75,10 +75,9 @@ giving them tools they need.
 // both are required
 // Example usage: 
 const payze = PayzeApplePay('merchant.io.payze', {
-  amount: 10, // 
-  currencyCode: 'GEL', // default
-  countryCode: 'GE', // default
-  label: 'Payze' // default
+  amount: 10, // required
+  currencyCode: 'GEL', // default (not required)
+  label: 'Payze' // default (not required)
 });
  ```
 

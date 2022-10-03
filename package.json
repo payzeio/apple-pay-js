@@ -1,6 +1,6 @@
 {
   "name": "@payze/payze-apple-pay",
-  "version": "0.0.10",
+  "version": "0.0.13",
   "description": "payze.io payment gateway",
   "main": "payzeApplePay.bundle.js",
   "module": "payzeApplePay.js",
