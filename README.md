@@ -51,7 +51,7 @@ giving them tools they need.
    ```
 2. Initialize payze
    ```ts
-   const applePay = PayzeApplePay({});
+   const applePay = PayzeApplePay(merchantIdentifier, { amount, currencyCode, label });
    ```
 3. Include following html
    ```html

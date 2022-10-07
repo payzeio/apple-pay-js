@@ -5,11 +5,10 @@
  * @param {string=} config // configure  
  * @param {string=} config.amount  // pay amount (0.1, 10, 2.5)
  * @param {string=} config.currencyCode  // default is GEL
- * @param {string=} config.countryCode  // default is GE
  * @param {string=} config.label  // 'Payze' is default
  *
  */
-function PayzeApplePay(merchantIdentifier, { amount, currencyCode, countryCode, label }) {
+function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }) {
   if (!merchantIdentifier) {
     throw 'merchant Identifier is required';
   }
@@ -22,9 +21,8 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, countryCode, 
     currencyCode = "GEL";
   }
 
-  if (!countryCode) {
-    countryCode = "GE";
-  }
+  var countryCode = "GE";
+
 
   if (!label) {
     label = "Payze";
