@@ -8,22 +8,37 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-function _objectDestructuringEmpty(obj) { if (obj == null) throw new TypeError("Cannot destructure undefined"); }
-
 /**
  * Init Payze Apple Pay SDK
  *
- * @param {string} trId  Transaction ID.
- * @param {string=} style  Form CSS Styles.
- * @param {string=} style.iframeWidth  IframeWidth size.
- * @param {string=} style.iframeHeight  IframeHeight size.
+ * @param {string=} merchantIdentifier  Merchant Identifier (merchant.io.payze...)
+ * @param {string=} config // configure  
+ * @param {string=} config.amount  // pay amount (0.1, 10, 2.5)
+ * @param {string=} config.currencyCode  // default is GEL
+ * @param {string=} config.label  // 'Payze' is default
  *
  */
-function PayzeApplePay(trId, _ref) {
-  _objectDestructuringEmpty(_ref);
+function PayzeApplePay(merchantIdentifier, _ref) {
+  var amount = _ref.amount,
+      currencyCode = _ref.currencyCode,
+      label = _ref.label;
 
-  if (!trId) {
-    throw 'transactionId is required';
+  if (!merchantIdentifier) {
+    throw 'merchant Identifier is required';
+  }
+
+  if (!amount) {
+    throw 'amount is required';
+  }
+
+  if (!currencyCode) {
+    currencyCode = "GEL";
+  }
+
+  var countryCode = "GE";
+
+  if (!label) {
+    label = "Payze";
   }
 
   var canUseApplePay = false;
@@ -36,7 +51,7 @@ function PayzeApplePay(trId, _ref) {
   init();
   console.info('Payze Apple Pay SDK initialized');
 
-  function validateMerchant() {
+  function validateMerchant(trId) {
     return fetch("".concat(BASE_URL, "/start-payment"), {
       method: "POST",
       body: JSON.stringify({
@@ -47,36 +62,47 @@ function PayzeApplePay(trId, _ref) {
   }
 
   function init() {
-    var merchantIdentifier = 'merchant.io.payze.landing';
-    var promise = window.ApplePaySession.canMakePaymentsWithActiveCard(merchantIdentifier);
-    promise.then(function (canMakePayments) {
-      var button = document.getElementById('apple-pay-button');
+    if (window.ApplePaySession) {
+      var promise = window.ApplePaySession.canMakePaymentsWithActiveCard(merchantIdentifier);
+      promise.then(function (canMakePayments) {
+        var button = document.getElementById('apple-pay-button');
 
-      if (window.ApplePaySession || canMakePayments) {
-        canUseApplePay = true;
-      } else {
-        button.removeEventListener('click', clickHandler, false);
-        button.remove();
-        canUseApplePay = false;
-      }
-    });
+        if (window.ApplePaySession || canMakePayments) {
+          canUseApplePay = true;
+        } else {
+          button.removeEventListener('click', clickHandler, false);
+          button.remove();
+          canUseApplePay = false;
+        }
+      });
+    }
   }
+  /**
+  * Make Payze Apple Pay With TransactionId
+  *
+  * @param {string} trId  Transaction ID.
+  * 
+  */
 
-  function onApplePayClick() {
+
+  function makeApplePay(trId) {
     if (!canUseApplePay) {
+      throw 'can"t use apple pay';
+    }
+
+    if (!trId) {
       throw 'transactionId is required';
-      return;
     }
 
     var applePayToken = null;
     var request = {
-      countryCode: 'GE',
-      currencyCode: 'GEL',
+      countryCode: countryCode,
+      currencyCode: currencyCode,
       supportedNetworks: ['visa', 'masterCard', 'amex', 'discover'],
       merchantCapabilities: ['supports3DS'],
       total: {
-        label: 'Payze',
-        amount: '0.1'
+        label: label,
+        amount: amount
       }
     };
     var session = new window.ApplePaySession(10, request);
@@ -88,7 +114,7 @@ function PayzeApplePay(trId, _ref) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                merchantSession = validateMerchant();
+                merchantSession = validateMerchant(trId);
                 merchantSession.then(function (response) {
                   response.json().then(function (data) {
                     applePayToken = data.data.token;
@@ -116,8 +142,8 @@ function PayzeApplePay(trId, _ref) {
     session.onpaymentmethodselected = function (event) {
       var update = {
         newTotal: {
-          label: "Payze",
-          amount: "0.1"
+          label: label,
+          amount: amount
         }
       };
       session.completePaymentMethodSelection(update);
@@ -170,10 +196,11 @@ function PayzeApplePay(trId, _ref) {
     };
 
     session.begin();
-    return {
-      onApplePayClick: onApplePayClick
-    };
   }
+
+  return {
+    makeApplePay: makeApplePay
+  };
 }
 
 module.exports.PayzeApplePay = PayzeApplePay;

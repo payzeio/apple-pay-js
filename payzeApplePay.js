@@ -59,7 +59,7 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }) {
         if (window.ApplePaySession || canMakePayments) {
           canUseApplePay = true;
         } else {
-          button.removeEventListener('click', clickHandler, false);
+          button.removeEventListener('click', makeApplePay, false);
           button.remove();
           canUseApplePay = false;
         }
