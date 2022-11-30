@@ -16,19 +16,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
  * @param {string=} config.amount  // pay amount (0.1, 10, 2.5)
  * @param {string=} config.currencyCode  // default is GEL
  * @param {string=} config.label  // 'Payze' is default
+ * @param {function=} callback  // callback to get the status of the payment
  *
  */
 function PayzeApplePay(merchantIdentifier, _ref) {
   var amount = _ref.amount,
       currencyCode = _ref.currencyCode,
       label = _ref.label;
+  var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
   if (!merchantIdentifier) {
-    throw 'merchant Identifier is required';
+    throw "merchant Identifier is required";
   }
 
   if (!amount) {
-    throw 'amount is required';
+    throw "amount is required";
   }
 
   if (!currencyCode) {
@@ -70,7 +72,7 @@ function PayzeApplePay(merchantIdentifier, _ref) {
         if (window.ApplePaySession || canMakePayments) {
           canUseApplePay = true;
         } else {
-          button.removeEventListener('click', clickHandler, false);
+          button.removeEventListener('click', makeApplePay, false);
           button.remove();
           canUseApplePay = false;
         }
@@ -87,11 +89,11 @@ function PayzeApplePay(merchantIdentifier, _ref) {
 
   function makeApplePay(trId) {
     if (!canUseApplePay) {
-      throw 'can"t use apple pay';
+      throw "can't use apple pay";
     }
 
     if (!trId) {
-      throw 'transactionId is required';
+      throw "transactionId is required";
     }
 
     var applePayToken = null;
@@ -187,12 +189,23 @@ function PayzeApplePay(merchantIdentifier, _ref) {
             "status": status
           };
           session.completePayment(result);
+
+          if (callback) {
+            callback(result);
+          }
         });
       });
     };
 
     session.oncancel = function (event) {
-      console.log("oncancel", JSON.stringify(event));
+      if (callback) {
+        var result = {
+          "status": window.ApplePaySession.STATUS_FAILURE
+        };
+        callback(result);
+      }
+
+      ;
     };
 
     session.begin();

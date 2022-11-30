@@ -6,15 +6,16 @@
  * @param {string=} config.amount  // pay amount (0.1, 10, 2.5)
  * @param {string=} config.currencyCode  // default is GEL
  * @param {string=} config.label  // 'Payze' is default
+ * @param {function=} callback  // callback to get the status of the payment
  *
  */
-function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }) {
+function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, callback = null) {
   if (!merchantIdentifier) {
-    throw 'merchant Identifier is required';
+    throw "merchant Identifier is required";
   }
 
   if (!amount) {
-    throw 'amount is required';
+    throw "amount is required";
   }
 
   if (!currencyCode) {
@@ -75,11 +76,11 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }) {
   */
   function makeApplePay(trId) {
     if (!canUseApplePay) {
-      throw 'can"t use apple pay';
+      throw "can't use apple pay";
     }
 
     if (!trId) {
-      throw 'transactionId is required';
+      throw "transactionId is required";
     }
 
     var applePayToken = null;
@@ -162,13 +163,23 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }) {
           };
 
           session.completePayment(result);
+          
+          if (callback) {
+            callback(result);
+          }
         })
       });
     };
 
     session.oncancel = (event) => {
-      console.log("oncancel", JSON.stringify(event));
-    };
+      if (callback) {
+        const result = {
+          "status": (window).ApplePaySession.STATUS_FAILURE
+        };
+        callback(result);
+      };
+    }
+
     session.begin();
   }
 
