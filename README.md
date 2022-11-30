@@ -51,7 +51,7 @@ giving them tools they need.
    ```
 2. Initialize payze
    ```ts
-   const applePay = PayzeApplePay(merchantIdentifier, { amount, currencyCode, label });
+   const applePay = PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, callback);
    ```
 3. Include following html
    ```html
@@ -78,7 +78,13 @@ const payze = PayzeApplePay('merchant.io.payze', {
   amount: 10, // required
   currencyCode: 'GEL', // default (not required)
   label: 'Payze' // default (not required)
-});
+}, applePayResultStatus);
+
+applePayResultStatus(result) {
+   console.log(result);
+   //status: 0 success
+   //status: 1 failed
+}
  ```
 
 <!-- LICENSE -->
