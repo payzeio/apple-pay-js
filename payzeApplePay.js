@@ -55,14 +55,12 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
   function init() {
     if (window.ApplePaySession) {
       var promise = window.ApplePaySession.canMakePaymentsWithActiveCard(merchantIdentifier);
-      promise.then(function (canMakePayments) {
-        var button = document.getElementById('apple-pay-button');
-        if (window.ApplePaySession || canMakePayments) {
-          canUseApplePay = true;
-        } else {
+      promise.then(function (canMakePaymentsWallet) {
+        canUseApplePay = canMakePaymentsWallet;
+        if (!canMakePaymentsWallet) {
+          var button = document.getElementById('apple-pay-button');
           button.removeEventListener('click', makeApplePay, false);
           button.remove();
-          canUseApplePay = false;
         }
       });
     }
@@ -163,7 +161,7 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
           };
 
           session.completePayment(result);
-          
+
           if (callback) {
             callback(result);
           }
@@ -177,7 +175,7 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
           "status": (window).ApplePaySession.STATUS_FAILURE
         };
         callback(result);
-      };
+      }
     }
 
     session.begin();
