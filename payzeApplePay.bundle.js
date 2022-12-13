@@ -212,7 +212,7 @@ function PayzeApplePay(merchantIdentifier, _ref) {
     if (typeof trId === 'string') {
       session.begin();
     } else {
-      return trId().then(function (id) {
+      return trId.then(function (id) {
         promisedTrId = id;
         session.begin();
       }).catch(function (error) {

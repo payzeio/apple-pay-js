@@ -182,7 +182,7 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
     if (typeof trId === 'string') {
       session.begin()
     } else {
-      return trId().then((id) => {
+      return trId.then((id) => {
         promisedTrId = id
         session.begin()
       })
