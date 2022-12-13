@@ -95,7 +95,7 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
     const session = new (window).ApplePaySession(10, request);
 
     session.onvalidatemerchant = async (event) => {
-      const merchantSession = validateMerchant(trId);
+      const merchantSession = validateMerchant(promisedTrId ?? trId);
       merchantSession.then((response) => {
         response.json().then((data) => {
           applePayToken = data.data.token;

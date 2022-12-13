@@ -110,12 +110,14 @@ function PayzeApplePay(merchantIdentifier, _ref) {
 
     session.onvalidatemerchant = /*#__PURE__*/function () {
       var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(event) {
+        var _promisedTrId;
+
         var merchantSession;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                merchantSession = validateMerchant(trId);
+                merchantSession = validateMerchant((_promisedTrId = promisedTrId) !== null && _promisedTrId !== void 0 ? _promisedTrId : trId);
                 merchantSession.then(function (response) {
                   response.json().then(function (data) {
                     applePayToken = data.data.token;
@@ -156,14 +158,14 @@ function PayzeApplePay(merchantIdentifier, _ref) {
     };
 
     session.onpaymentauthorized = function (event) {
-      var _promisedTrId;
+      var _promisedTrId2;
 
       var token = event.payment.token;
       var acceptApplePay = fetch("".concat(BASE_URL, "/accept"), {
         method: "POST",
         body: JSON.stringify({
           token: applePayToken,
-          payzeTransactionId: (_promisedTrId = promisedTrId) !== null && _promisedTrId !== void 0 ? _promisedTrId : trId,
+          payzeTransactionId: (_promisedTrId2 = promisedTrId) !== null && _promisedTrId2 !== void 0 ? _promisedTrId2 : trId,
           acceptRequest: {
             version: token.paymentData.version,
             data: token.paymentData.data,
