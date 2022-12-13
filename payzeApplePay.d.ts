@@ -11,5 +11,5 @@
  */
 
 export function PayzeApplePay(merchantIdentifier: string, config: any, callback?: any): {
-  makeApplePay: (trId: string) => void;
+  makeApplePay: (trId: Promise<string> | string) => Promise<void>;
 };

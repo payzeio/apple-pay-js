@@ -69,7 +69,7 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
   /**
   * Make Payze Apple Pay With TransactionId
   *
-  * @param {string} trId  Transaction ID.
+  * @param {string} trId  Transaction ID or promise that returns it.
   * 
   */
   function makeApplePay(trId) {
@@ -82,6 +82,7 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
     }
 
     var applePayToken = null;
+    var promisedTrId = null;
 
     var request = {
       countryCode: countryCode,
@@ -131,7 +132,7 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
         method: "POST",
         body: JSON.stringify({
           token: applePayToken,
-          payzeTransactionId: trId,
+          payzeTransactionId: promisedTrId ?? trId,
           acceptRequest: {
             version: token.paymentData.version,
             data: token.paymentData.data,
@@ -178,7 +179,18 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
       }
     }
 
-    session.begin();
+    if (typeof trId === 'string') {
+      session.begin()
+    } else {
+      return trId().then((id) => {
+        promisedTrId = id
+        session.begin()
+      })
+      .catch((error) => {
+        session.abort()
+        throw error
+      })
+    }
   }
 
   return {
