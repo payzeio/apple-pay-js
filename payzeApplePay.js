@@ -69,7 +69,7 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
   /**
   * Make Payze Apple Pay With TransactionId
   *
-  * @param {string} trId  Transaction ID or promise that returns it.
+  * @param {(string|Promise<string>)} trId  Transaction ID or promise that returns it.
   * 
   */
   function makeApplePay(trId) {
