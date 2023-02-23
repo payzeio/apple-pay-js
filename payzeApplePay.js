@@ -42,11 +42,12 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
   init();
   console.info('Payze Apple Pay SDK initialized');
 
-  function validateMerchant(trId) {
+  function validateMerchant(trId, preAuth) {
     return fetch(`${BASE_URL}/start-payment`, {
       method: "POST",
       body: JSON.stringify({
-        transactionId: trId
+        transactionId: trId,
+        preauthorize: preAuth
       }),
       headers: headers
     });
@@ -72,13 +73,17 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
   * @param {string} trId  Transaction ID.
   * 
   */
-  function makeApplePay(trId) {
+  function makeApplePay(trId, preAuth) {
     if (!canUseApplePay) {
       throw "can't use apple pay";
     }
 
     if (!trId) {
       throw "transactionId is required";
+    }
+
+    if (!preAuth) {
+      preAuth = false;
     }
 
     var applePayToken = null;
@@ -94,7 +99,7 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
     const session = new (window).ApplePaySession(10, request);
 
     session.onvalidatemerchant = async (event) => {
-      const merchantSession = validateMerchant(trId);
+      const merchantSession = validateMerchant(trId, preAuth);
       merchantSession.then((response) => {
         response.json().then((data) => {
           applePayToken = data.data.token;
@@ -174,7 +179,7 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
         const result = {
           "status": (window).ApplePaySession.STATUS_FAILURE
         };
-        callback(result);
+        callback(result, event);
       }
     }
 
