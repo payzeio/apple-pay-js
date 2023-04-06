@@ -39,7 +39,7 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
     "Content-type": "application/json"
   };
 
-  init();
+  var promise = init();
   console.info('Payze Apple Pay SDK initialized');
 
   function validateMerchant(trId, preAuth) {
@@ -56,15 +56,10 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
   function init() {
     if (!canUseApplePay && window.ApplePaySession) {
       var promise = window.ApplePaySession.canMakePaymentsWithActiveCard(merchantIdentifier);
-      promise.then(function (canMakePaymentsWallet) {
-        canUseApplePay = canMakePaymentsWallet;
-        if (!canMakePaymentsWallet) {
-          var button = document.getElementById('apple-pay-button');
-          button.removeEventListener('click', makeApplePay, false);
-          button.remove();
-        }
-      });
+      return promise;
     }
+
+    return null;
   }
 
   /**
@@ -74,6 +69,22 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
   * 
   */
   function makeApplePay(trId, preAuth) {
+    if (promise) {
+      promise.then(function (canMakePaymentsWallet) {
+        canUseApplePay = canMakePaymentsWallet;
+        if (!canMakePaymentsWallet) {
+          try {
+            var button = document.getElementById('apple-pay-button');
+            if (button) {
+              button.removeEventListener('click', makeApplePay, false);
+              button.remove();
+            }
+          }
+          catch (e) { }
+        }
+      });
+    }
+
     if (!canUseApplePay) {
       throw "can't use apple pay";
     }
