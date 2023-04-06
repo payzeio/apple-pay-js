@@ -65,7 +65,7 @@ function PayzeApplePay(merchantIdentifier, _ref) {
   }
 
   function init() {
-    if (window.ApplePaySession) {
+    if (!canUseApplePay && window.ApplePaySession) {
       var promise = window.ApplePaySession.canMakePaymentsWithActiveCard(merchantIdentifier);
       promise.then(function (canMakePaymentsWallet) {
         canUseApplePay = canMakePaymentsWallet;
