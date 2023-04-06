@@ -82,121 +82,122 @@ function PayzeApplePay(merchantIdentifier, { amount, currencyCode, label }, call
           }
           catch (e) { }
         }
-      });
-      if (!canUseApplePay) {
-        throw "can't use apple pay";
-      }
 
-      if (!trId) {
-        throw "transactionId is required";
-      }
 
-      if (!preAuth) {
-        preAuth = false;
-      }
+        if (!canUseApplePay) {
+          throw "can't use apple pay";
+        }
 
-      var applePayToken = null;
+        if (!trId) {
+          throw "transactionId is required";
+        }
 
-      var request = {
-        countryCode: countryCode,
-        currencyCode: currencyCode,
-        supportedNetworks: ['visa', 'masterCard', 'amex', 'discover'],
-        merchantCapabilities: ['supports3DS'],
-        total: { label: label, amount: amount }
-      }
+        if (!preAuth) {
+          preAuth = false;
+        }
 
-      const session = new (window).ApplePaySession(10, request);
+        var applePayToken = null;
 
-      session.onvalidatemerchant = async (event) => {
-        const merchantSession = validateMerchant(trId, preAuth);
-        merchantSession.then((response) => {
-          response.json().then((data) => {
-            applePayToken = data.data.token;
-            session.completeMerchantValidation(data.data);
+        var request = {
+          countryCode: countryCode,
+          currencyCode: currencyCode,
+          supportedNetworks: ['visa', 'masterCard', 'amex', 'discover'],
+          merchantCapabilities: ['supports3DS'],
+          total: { label: label, amount: amount }
+        }
+
+        const session = new (window).ApplePaySession(10, request);
+
+        session.onvalidatemerchant = async (event) => {
+          const merchantSession = validateMerchant(trId, preAuth);
+          merchantSession.then((response) => {
+            response.json().then((data) => {
+              applePayToken = data.data.token;
+              session.completeMerchantValidation(data.data);
+            }).catch((err) => {
+              console.log(err);
+            })
           }).catch((err) => {
             console.log(err);
-          })
-        }).catch((err) => {
-          console.log(err);
-        });
-      };
-
-      session.onpaymentmethodselected = (event) => {
-
-        const update = {
-          newTotal: { label: label, amount: amount },
+          });
         };
 
-        session.completePaymentMethodSelection(update);
-      };
+        session.onpaymentmethodselected = (event) => {
 
-      session.onshippingmethodselected = (event) => {
-
-        const update = {};
-
-        session.completeShippingMethodSelection(update);
-
-      };
-
-      session.onpaymentauthorized = (event) => {
-        var token = event.payment.token;
-
-        var acceptApplePay = fetch(`${BASE_URL}/accept`, {
-          method: "POST",
-          body: JSON.stringify({
-            token: applePayToken,
-            payzeTransactionId: trId,
-            acceptRequest: {
-              version: token.paymentData.version,
-              data: token.paymentData.data,
-              signature: token.paymentData.signature,
-              ephemeralPublicKey: token.paymentData.header.ephemeralPublicKey,
-              publicKeyHash: token.paymentData.header.publicKeyHash,
-              transactionId: token.paymentData.header.transactionId,
-              displayName: token.paymentMethod.displayName,
-              network: token.paymentMethod.network,
-              type: token.paymentMethod.type,
-              transactionIdentifier: token.transactionIdentifier
-            }
-          }),
-          headers: headers
-        });
-
-        var status = (window).ApplePaySession.STATUS_FAILURE;
-
-        acceptApplePay.then((response) => {
-          response.json().then((data) => {
-            if (data.status.code == "Success") {
-              status = (window).ApplePaySession.STATUS_SUCCESS;
-            }
-
-            const result = {
-              "status": status
-            };
-
-            session.completePayment(result);
-
-            if (callback) {
-              callback(result);
-            }
-          })
-        });
-      };
-
-      session.oncancel = (event) => {
-        if (callback) {
-          const result = {
-            "status": (window).ApplePaySession.STATUS_FAILURE
+          const update = {
+            newTotal: { label: label, amount: amount },
           };
-          callback(result, event);
-        }
-      }
 
-      session.begin();
+          session.completePaymentMethodSelection(update);
+        };
+
+        session.onshippingmethodselected = (event) => {
+
+          const update = {};
+
+          session.completeShippingMethodSelection(update);
+
+        };
+
+        session.onpaymentauthorized = (event) => {
+          var token = event.payment.token;
+
+          var acceptApplePay = fetch(`${BASE_URL}/accept`, {
+            method: "POST",
+            body: JSON.stringify({
+              token: applePayToken,
+              payzeTransactionId: trId,
+              acceptRequest: {
+                version: token.paymentData.version,
+                data: token.paymentData.data,
+                signature: token.paymentData.signature,
+                ephemeralPublicKey: token.paymentData.header.ephemeralPublicKey,
+                publicKeyHash: token.paymentData.header.publicKeyHash,
+                transactionId: token.paymentData.header.transactionId,
+                displayName: token.paymentMethod.displayName,
+                network: token.paymentMethod.network,
+                type: token.paymentMethod.type,
+                transactionIdentifier: token.transactionIdentifier
+              }
+            }),
+            headers: headers
+          });
+
+          var status = (window).ApplePaySession.STATUS_FAILURE;
+
+          acceptApplePay.then((response) => {
+            response.json().then((data) => {
+              if (data.status.code == "Success") {
+                status = (window).ApplePaySession.STATUS_SUCCESS;
+              }
+
+              const result = {
+                "status": status
+              };
+
+              session.completePayment(result);
+
+              if (callback) {
+                callback(result);
+              }
+            })
+          });
+        };
+
+        session.oncancel = (event) => {
+          if (callback) {
+            const result = {
+              "status": (window).ApplePaySession.STATUS_FAILURE
+            };
+            callback(result, event);
+          }
+        }
+
+        session.begin();
+      });
     }
 
   }
-
 
   return {
     makeApplePay
