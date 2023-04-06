@@ -96,131 +96,131 @@ function PayzeApplePay(merchantIdentifier, _ref) {
           } catch (e) {}
         }
       });
-    }
 
-    if (!canUseApplePay) {
-      throw "can't use apple pay";
-    }
-
-    if (!trId) {
-      throw "transactionId is required";
-    }
-
-    if (!preAuth) {
-      preAuth = false;
-    }
-
-    var applePayToken = null;
-    var request = {
-      countryCode: countryCode,
-      currencyCode: currencyCode,
-      supportedNetworks: ['visa', 'masterCard', 'amex', 'discover'],
-      merchantCapabilities: ['supports3DS'],
-      total: {
-        label: label,
-        amount: amount
+      if (!canUseApplePay) {
+        throw "can't use apple pay";
       }
-    };
-    var session = new window.ApplePaySession(10, request);
 
-    session.onvalidatemerchant = /*#__PURE__*/function () {
-      var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(event) {
-        var merchantSession;
-        return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                merchantSession = validateMerchant(trId, preAuth);
-                merchantSession.then(function (response) {
-                  response.json().then(function (data) {
-                    applePayToken = data.data.token;
-                    session.completeMerchantValidation(data.data);
-                  }).catch(function (err) {
-                    console.log(err);
-                  });
-                }).catch(function (err) {
-                  console.log(err);
-                });
+      if (!trId) {
+        throw "transactionId is required";
+      }
 
-              case 2:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee);
-      }));
+      if (!preAuth) {
+        preAuth = false;
+      }
 
-      return function (_x) {
-        return _ref2.apply(this, arguments);
-      };
-    }();
-
-    session.onpaymentmethodselected = function (event) {
-      var update = {
-        newTotal: {
+      var applePayToken = null;
+      var request = {
+        countryCode: countryCode,
+        currencyCode: currencyCode,
+        supportedNetworks: ['visa', 'masterCard', 'amex', 'discover'],
+        merchantCapabilities: ['supports3DS'],
+        total: {
           label: label,
           amount: amount
         }
       };
-      session.completePaymentMethodSelection(update);
-    };
+      var session = new window.ApplePaySession(10, request);
 
-    session.onshippingmethodselected = function (event) {
-      var update = {};
-      session.completeShippingMethodSelection(update);
-    };
+      session.onvalidatemerchant = /*#__PURE__*/function () {
+        var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(event) {
+          var merchantSession;
+          return _regeneratorRuntime().wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  merchantSession = validateMerchant(trId, preAuth);
+                  merchantSession.then(function (response) {
+                    response.json().then(function (data) {
+                      applePayToken = data.data.token;
+                      session.completeMerchantValidation(data.data);
+                    }).catch(function (err) {
+                      console.log(err);
+                    });
+                  }).catch(function (err) {
+                    console.log(err);
+                  });
 
-    session.onpaymentauthorized = function (event) {
-      var token = event.payment.token;
-      var acceptApplePay = fetch("".concat(BASE_URL, "/accept"), {
-        method: "POST",
-        body: JSON.stringify({
-          token: applePayToken,
-          payzeTransactionId: trId,
-          acceptRequest: {
-            version: token.paymentData.version,
-            data: token.paymentData.data,
-            signature: token.paymentData.signature,
-            ephemeralPublicKey: token.paymentData.header.ephemeralPublicKey,
-            publicKeyHash: token.paymentData.header.publicKeyHash,
-            transactionId: token.paymentData.header.transactionId,
-            displayName: token.paymentMethod.displayName,
-            network: token.paymentMethod.network,
-            type: token.paymentMethod.type,
-            transactionIdentifier: token.transactionIdentifier
-          }
-        }),
-        headers: headers
-      });
-      var status = window.ApplePaySession.STATUS_FAILURE;
-      acceptApplePay.then(function (response) {
-        response.json().then(function (data) {
-          if (data.status.code == "Success") {
-            status = window.ApplePaySession.STATUS_SUCCESS;
-          }
+                case 2:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee);
+        }));
 
-          var result = {
-            "status": status
-          };
-          session.completePayment(result);
-
-          if (callback) {
-            callback(result);
-          }
-        });
-      });
-    };
-
-    session.oncancel = function (event) {
-      if (callback) {
-        var result = {
-          "status": window.ApplePaySession.STATUS_FAILURE
+        return function (_x) {
+          return _ref2.apply(this, arguments);
         };
-        callback(result, event);
-      }
-    };
+      }();
 
-    session.begin();
+      session.onpaymentmethodselected = function (event) {
+        var update = {
+          newTotal: {
+            label: label,
+            amount: amount
+          }
+        };
+        session.completePaymentMethodSelection(update);
+      };
+
+      session.onshippingmethodselected = function (event) {
+        var update = {};
+        session.completeShippingMethodSelection(update);
+      };
+
+      session.onpaymentauthorized = function (event) {
+        var token = event.payment.token;
+        var acceptApplePay = fetch("".concat(BASE_URL, "/accept"), {
+          method: "POST",
+          body: JSON.stringify({
+            token: applePayToken,
+            payzeTransactionId: trId,
+            acceptRequest: {
+              version: token.paymentData.version,
+              data: token.paymentData.data,
+              signature: token.paymentData.signature,
+              ephemeralPublicKey: token.paymentData.header.ephemeralPublicKey,
+              publicKeyHash: token.paymentData.header.publicKeyHash,
+              transactionId: token.paymentData.header.transactionId,
+              displayName: token.paymentMethod.displayName,
+              network: token.paymentMethod.network,
+              type: token.paymentMethod.type,
+              transactionIdentifier: token.transactionIdentifier
+            }
+          }),
+          headers: headers
+        });
+        var status = window.ApplePaySession.STATUS_FAILURE;
+        acceptApplePay.then(function (response) {
+          response.json().then(function (data) {
+            if (data.status.code == "Success") {
+              status = window.ApplePaySession.STATUS_SUCCESS;
+            }
+
+            var result = {
+              "status": status
+            };
+            session.completePayment(result);
+
+            if (callback) {
+              callback(result);
+            }
+          });
+        });
+      };
+
+      session.oncancel = function (event) {
+        if (callback) {
+          var result = {
+            "status": window.ApplePaySession.STATUS_FAILURE
+          };
+          callback(result, event);
+        }
+      };
+
+      session.begin();
+    }
   }
 
   return {
